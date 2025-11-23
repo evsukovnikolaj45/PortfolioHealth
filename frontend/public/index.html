@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Portfolio Health — Zama FHEVM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600;800&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      /* Golden theme */
+      --gold-1:#f9e6b3;     /* light text on dark */
+      --gold-2:#ffce58;     /* bright accent */
+      --gold-3:#d6a63b;     /* rich gold */
+      --amber:#ff9a1f;      /* button orange */
+      --ink:#20160b;        /* dark text */
+      --bg:#12100d;         /* page background */
+      --panel:rgba(255,245,217,.06);
+      --line:rgba(255,240,200,.18);
+      --muted:#e8d9ac;
+      --good:#10b981;
+      --warn:#f59e0b;
+      --err:#ef4444;
+      --r:16px;
+      --shadow:0 20px 60px rgba(0,0,0,.5);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--gold-1);
+      background:
+        radial-gradient(1400px 900px at 0% -10%, rgba(255,222,148,.25), transparent 60%),
+        radial-gradient(1200px 700px at 120% 10%, rgba(255,193,90,.18), transparent 50%),
+        linear-gradient(180deg,#0e0c09 0%, #17130c 60%, #13100a 100%);
+        background-attachment: fixed;
+      font:15px/1.6 "Instrument Sans", ui-sans-serif, system-ui, Segoe UI, Roboto, Arial;
+    }
+
+    /* Full-width header in contrasting color */
+    header.site{
+      width:100%;
+      background:linear-gradient(180deg, #1a2231, #0f1624);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      position:sticky; top:0; z-index:10;
+    }
+    .nav{max-width:1200px;margin:0 auto;padding:16px 24px;display:flex;gap:14px;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:36px;height:36px;border-radius:12px;
+      background:conic-gradient(from 180deg at 50% 50%, #ffda6b, #ffb238, #c8861a, #ffe28b);
+      box-shadow:0 6px 22px rgba(255,174,0,.35);
+    }
+    .title{font-family:"Unbounded", system-ui; font-weight:800; letter-spacing:.2px}
+    .title b{background:linear-gradient(135deg,#ffd46a,#ffb13a,#ffda86);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .badges{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#e7f0ff}
+
+    /* Connect button (orange, MetaMask icon) */
+    .btn{appearance:none;border:none;cursor:pointer;border-radius:14px;padding:10px 14px;font-weight:800;transition:transform .12s ease, filter .2s ease;display:inline-flex;align-items:center;gap:10px}
+    .btn:active{transform:translateY(0)}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-connect{background:linear-gradient(135deg,var(--amber),#ffd9a8);color:#3f1f05;box-shadow:0 10px 28px rgba(255,153,31,.35)}
+    .fox{width:18px;height:18px}
+
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 24px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+    .card{grid-column:span 12;background:var(--panel);backdrop-filter:saturate(1.05) blur(2px);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);opacity:0;transform:translateY(14px)}
+    .card.in{animation:rise .6s cubic-bezier(.2,.8,.2,1) forwards}
+    @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @media (min-width:992px){.span-6{grid-column:span 6}.span-7{grid-column:span 7}.span-5{grid-column:span 5}.span-8{grid-column:span 8}.span-4{grid-column:span 4}}
+
+    .hrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    h3{font-family:"Unbounded";margin:0 0 6px;font-size:18px;letter-spacing:.2px}
+
+    label{display:block;color:var(--muted);font-weight:800;margin:10px 0 6px}
+    input,select{width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--gold-1)}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    th,td{padding:10px;border-bottom:1px dashed var(--line)}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .muted{color:#e6d9b5;font-size:12px}
+    .status{margin-top:10px;color:#2f1e07;font-weight:800;background:rgba(255,219,141,.75);display:inline-block;padding:6px 10px;border-radius:999px}
+    .result{padding:12px;border-radius:12px;border:1px dashed var(--line);text-align:center;font-weight:900;background:rgba(0,0,0,.18)}
+
+    /* Footer */
+    footer.site{margin-top:28px;background:linear-gradient(180deg,#0f1624,#0b111e);border-top:1px solid rgba(255,255,255,.08)}
+    .foot{max-width:1200px;margin:0 auto;padding:20px 24px;color:#e7f0ff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    .foot small{opacity:.85}
+  </style>
+</head>
+<body>
+  <!-- Header full width, contrasting color -->
+  <header class="site">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="title">Portfolio <b>Health</b> · Zama FHEVM</div>
+      </div>
+      <div class="badges">
+        <div id="netBadge" class="pill">Network: —</div>
+        <div id="ctrBadge" class="pill">Contract: —</div>
+        <button id="connectBtn" class="btn btn-connect" title="Connect with MetaMask">
+          <!-- Minimal MetaMask fox (inline SVG) -->
+          <img height="20" src="https://raw.githubusercontent.com/MetaMask/metamask-extension/master/app/images/logo/metamask-fox.svg" alt="MetaMask">
+          <span>Connect</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="grid">
+      <!-- Settings / Contract -->
+      <section class="card span-12">
+        <div class="hrow"><h3>Settings</h3><span class="muted">Sepolia + Relayer SDK</span></div>
+        <div class="row" style="gap:12px">
+          <div style="flex:1;min-width:260px">
+            <label>Contract Address</label>
+            <input id="ctrAddr" placeholder="0x..."/>
+          </div>
+          <div style="width:260px">
+            <label>Relayer URL</label>
+            <input id="relayerUrl" placeholder="https://relayer.testnet.zama.cloud"/>
+          </div>
+          <div style="width:200px">
+            <label>Network</label>
+            <select id="networkSel">
+              <option value="Sepolia" selected>Sepolia</option>
+            </select>
+          </div>
+        </div>
+        <div class="muted" style="margin-top:6px">Admin настраивает веса/кэпы в контракте. Здесь пользователь шифрует суммы по активам и получает risk/health.</div>
+      </section>
+
+      <!-- Admin: Asset Parameters -->
+      <section class="card span-12">
+        <div class="hrow"><h3>Admin · Asset Parameters</h3><span class="muted">setAssetParam / assetParams</span></div>
+        <div class="row" style="gap:12px">
+          <div style="flex:1;min-width:220px"><label>Asset ID (string)</label><input id="admAssetStr" placeholder="e.g. WETH"/></div>
+          <div style="width:220px"><label>Weight (bps 0..10000)</label><input id="admWeight" type="number" min="0" max="10000" placeholder="3500"/></div>
+          <div style="width:220px"><label>Cap (USD)</label><input id="admCapUsd" type="number" min="0" step="0.01" placeholder="100000.00"/></div>
+          <button id="admCheck" class="btn" style="background:linear-gradient(135deg,#ffd88a,#fff0c8);color:#3b2a08">Check</button>
+          <button id="admSet" class="btn" style="background:linear-gradient(135deg,#ffb23b,#ffd991);color:#2b1e05">Set Param</button>
+        </div>
+        <div id="admOut" class="status" style="display:none"></div>
+      </section>
+
+      <!-- Portfolio Inputs -->
+      <section class="card span-8">
+        <div class="hrow"><h3>Encrypted Inputs</h3><button id="addRow" class="btn" style="background:linear-gradient(135deg,#ffda6b,#ffd08e);color:#3b2a08">+ Add asset</button></div>
+        <label>Portfolio ID (string → bytes32)</label>
+        <input id="portfolioStr" placeholder="e.g. wallet-1"/>
+        <div style="margin-top:10px">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:45%">Asset ID (string)</th>
+                <th style="width:35%">Amount (USD)</th>
+                <th style="width:20%"></th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button id="computeBtn" class="btn" style="background:linear-gradient(135deg,#d6a63b,#ffda6b);color:#2a1e07">Encrypt & Compute</button>
+          <div id="computeStatus" class="muted"></div>
+        </div>
+        <div id="txBox" class="status" style="display:none"></div>
+      </section>
+
+      <!-- Handles & Decrypt -->
+      <section class="card span-4">
+        <div class="hrow"><h3>Results</h3><span class="muted">handles + decrypt</span></div>
+        <div class="muted">Последний resultId = nextResultId(portfolioId) − 1</div>
+        <label>riskBP handle</label>
+        <input id="riskH" readonly placeholder="0x…"/>
+        <label>healthBP handle</label>
+        <input id="healthH" readonly placeholder="0x…"/>
+        <div class="row" style="margin-top:8px; gap:8px; flex-wrap:wrap">
+          <button id="pubDecRisk" class="btn" style="background:linear-gradient(135deg,#ffd88a,#fff0c8);color:#3b2a08">publicDecrypt risk</button>
+          <button id="pubDecHealth" class="btn" style="background:linear-gradient(135deg,#ffd88a,#fff0c8);color:#3b2a08">publicDecrypt health</button>
+          <button id="userDecRisk" class="btn" style="background:linear-gradient(135deg,#ffcc77,#ffeaca);color:#3b2a08">userDecrypt risk</button>
+          <button id="userDecHealth" class="btn" style="background:linear-gradient(135deg,#ffcc77,#ffeaca);color:#3b2a08">userDecrypt health</button>
+        </div>
+        <div style="margin-top:10px"><label>Value</label><div id="decOut" class="result">—</div></div>
+      </section>
+
+      <!-- Access controls -->
+      <section class="card span-12">
+        <div class="hrow"><h3>Access</h3></div>
+        <div class="row" style="gap:12px; align-items: end;">
+          <div style="flex:1;min-width:260px">
+            <label>Grant to</label>
+            <input id="grantTo" placeholder="0x…"/>
+          </div>
+          <button id="grantBtn" class="btn" style="background:linear-gradient(135deg,#ffcc66,#ffeab6);color:#3b2a08">grantResultAccess</button>
+          <button id="makePubBtn" class="btn" style="background:linear-gradient(135deg,#ffa43a,#ffe3b0);color:#3b2a08">makeResultPublic</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="foot">
+      <small>Built with <b>Zama FHEVM</b> • Relayer SDK 0.2.x • Ethers v6</small>
+      <small>Design: golden theme • header in contrasting blue • ♥</small>
+    </div>
+  </footer>
+
+  <script type="module">
+    console.log('%cPortfolioHealth Frontend','background:#ffd166;color:#231; padding:2px 6px; border-radius:6px', { version:'1.3.0-userdecrypt' });
+
+    import { BrowserProvider, Contract, getAddress, keccak256, toUtf8Bytes } from "https://cdn.jsdelivr.net/npm/ethers@6.13.4/+esm";
+    import * as ZAMA_SDK from "https://cdn.zama.org/relayer-sdk-js/0.3.0-5/relayer-sdk-js.js";
+
+    // ===== ABI for PortfolioHealth v1.0.x (with admin) =====
+    const ABI = [
+      { "inputs":[{"internalType":"bytes32","name":"portfolioId","type":"bytes32"},{"internalType":"bytes32[]","name":"assetIds","type":"bytes32[]"},{"internalType":"bytes32[]","name":"amounts","type":"bytes32[]"},{"internalType":"bytes","name":"attestation","type":"bytes"}],"name":"computePortfolio","outputs":[{"internalType":"uint256","name":"resultId","type":"uint256"}],"stateMutability":"nonpayable","type":"function" },
+      { "inputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"name":"nextResultId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function" },
+      { "inputs":[{"internalType":"bytes32","name":"portfolioId","type":"bytes32"},{"internalType":"uint256","name":"resultId","type":"uint256"}],"name":"riskHandle","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function" },
+      { "inputs":[{"internalType":"bytes32","name":"portfolioId","type":"bytes32"},{"internalType":"uint256","name":"resultId","type":"uint256"}],"name":"healthHandle","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function" },
+      { "inputs":[{"internalType":"bytes32","name":"portfolioId","type":"bytes32"},{"internalType":"uint256","name":"resultId","type":"uint256"},{"internalType":"address","name":"to","type":"address"}],"name":"grantResultAccess","outputs":[],"stateMutability":"nonpayable","type":"function" },
+      { "inputs":[{"internalType":"bytes32","name":"portfolioId","type":"bytes32"},{"internalType":"uint256","name":"resultId","type":"uint256"}],"name":"makeResultPublic","outputs":[],"stateMutability":"nonpayable","type":"function" },
+      { "inputs":[{"internalType":"bytes32","name":"assetId","type":"bytes32"}],"name":"assetParams","outputs":[{"internalType":"uint16","name":"weightBP","type":"uint16"},{"internalType":"uint64","name":"capUSDc","type":"uint64"},{"internalType":"bool","name":"set","type":"bool"}],"stateMutability":"view","type":"function" },
+      { "inputs":[{"internalType":"bytes32","name":"assetId","type":"bytes32"},{"internalType":"uint16","name":"weightBP","type":"uint16"},{"internalType":"uint64","name":"capUSDc","type":"uint64"}],"name":"setAssetParam","outputs":[],"stateMutability":"nonpayable","type":"function" }
+    ];
+
+    // ===== Config state =====
+    const CONFIG = {
+      NETWORK_NAME: "Sepolia",
+      CHAIN_ID_HEX: "0xaa36a7",
+      RELAYER_URL: "https://relayer.testnet.zama.cloud",
+      CONTRACT_ADDRESS: "0xf37FE8E568c01c06B52d0Aa980BBf71A3B027254" // ← set after deploy
+    };
+
+    console.log('[CFG] init', CONFIG);
+
+    // ===== UI helpers =====
+    const $ = s => document.querySelector(s);
+    const short = a => a ? a.slice(0,6) + '…' + a.slice(-4) : '—';
+    const toBytes32Id = (s) => keccak256(toUtf8Bytes(String(s||'')));
+    const toHex = (buf) => {
+      if (typeof buf === 'string') return buf.startsWith('0x') ? buf : '0x'+buf;
+      const u8 = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+      return '0x' + Array.from(u8, b => b.toString(16).padStart(2,'0')).join('');
+    };
+
+    // ===== Elements =====
+    const netBadge = $('#netBadge');
+    const ctrBadge = $('#ctrBadge');
+    const connectBtn = $('#connectBtn');
+    const ctrAddr = $('#ctrAddr');
+    const relayerUrl = $('#relayerUrl');
+    const rows = $('#rows');
+    const addRow = $('#addRow');
+    const portfolioStr = $('#portfolioStr');
+    const computeBtn = $('#computeBtn');
+    const computeStatus = $('#computeStatus');
+    const txBox = $('#txBox');
+    const riskH = $('#riskH');
+    const healthH = $('#healthH');
+    const pubDecRisk = $('#pubDecRisk');
+    const pubDecHealth = $('#pubDecHealth');
+    const userDecRisk = $('#userDecRisk');
+    const userDecHealth = $('#userDecHealth');
+    const decOut = $('#decOut');
+    const grantTo = $('#grantTo');
+    const grantBtn = $('#grantBtn');
+    const makePubBtn = $('#makePubBtn');
+
+    // Admin elements
+    const admAssetStr = $('#admAssetStr');
+    const admWeight = $('#admWeight');
+    const admCapUsd = $('#admCapUsd');
+    const admCheck = $('#admCheck');
+    const admSet = $('#admSet');
+    const admOut = $('#admOut');
+
+    // Animate cards
+    const io = new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+    document.querySelectorAll('.card').forEach(el=>io.observe(el));
+
+    // Wallet + Relayer
+    let provider, signer, address, contract, relayer;
+
+    ctrAddr.value = CONFIG.CONTRACT_ADDRESS;
+    relayerUrl.value = CONFIG.RELAYER_URL;
+    netBadge.textContent = `Network: ${CONFIG.NETWORK_NAME}`;
+    ctrBadge.textContent = `Contract: ${short(CONFIG.CONTRACT_ADDRESS)}`;
+
+    function addAssetRow(asset="WETH", usd="1000.00"){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input placeholder="e.g. WETH" value="${asset}"></td>
+        <td><input placeholder="1234.56" value="${usd}" type="number" step="0.01" min="0"></td>
+        <td style="text-align:right">
+          <button class="btn" style="background:linear-gradient(135deg,#ffb23b,#ffd991);color:#2b1e05">Remove</button>
+        </td>`;
+      tr.querySelector('button').addEventListener('click',()=> { console.log('[UI] remove row'); tr.remove(); });
+      rows.appendChild(tr);
+      console.log('[UI] add row', { asset, usd });
+    }
+    addAssetRow("WETH","1000.00");
+
+    addRow.addEventListener('click',()=> addAssetRow("USDC","500.00"));
+
+    async function initRelayer(){
+      if (relayer) return relayer;
+      await ZAMA_SDK.initSDK();
+      const { createInstance, SepoliaConfig } = ZAMA_SDK;
+      const url = (relayerUrl.value||'').trim() || CONFIG.RELAYER_URL;
+      relayer = await createInstance({ ...SepoliaConfig, relayerUrl: url, network: window.ethereum, debug: true });
+      console.log('[Relayer] created', { url });
+      return relayer;
+    }
+
+    async function connect(){
+      if(!window.ethereum) throw new Error('Install MetaMask');
+      provider = new BrowserProvider(window.ethereum);
+      await provider.send('eth_requestAccounts', []);
+      const net = await provider.getNetwork();
+      console.log('[Wallet] network', { chainId: String(net.chainId) });
+      if (net.chainId !== 11155111n) {
+        try { await provider.send('wallet_switchEthereumChain', [{ chainId: CONFIG.CHAIN_ID_HEX }]); console.log('[Wallet] switched to Sepolia'); } catch(e){ console.warn('[Wallet] switch failed', e); }
+      }
+      signer = await provider.getSigner();
+      address = await signer.getAddress();
+      const addr = (ctrAddr.value||'').trim() || CONFIG.CONTRACT_ADDRESS;
+      contract = new Contract(getAddress(addr), ABI, signer);
+      connectBtn.innerHTML = `<span style="width:8px;height:8px;background:#3df29b;border-radius:999px;display:inline-block"></span> ${short(address)}`;
+      ctrBadge.textContent = `Contract: ${short(addr)}`;
+      console.log('[Wallet] connected', { address, contract: addr });
+      await initRelayer();
+    }
+
+    connectBtn.addEventListener('click', async ()=>{ try{ await connect(); } catch(e){ console.error('[Connect][ERR]', e); alert(e.message||e); } });
+
+    function usdToCentsBigInt(v){
+      const s = String(v??'0').trim();
+      const [int, frac=''] = s.split('.');
+      const cents = (int||'0') + (frac + '00').slice(0,2);
+      const out = BigInt((cents||'0').replace(/[^0-9]/g,''));
+      console.log('[Utils] usd→cents', { input:v, out:String(out) });
+      return out;
+    }
+
+    function getCtrAddr(){
+      const a = contract?.target ? getAddress(contract.target) : getAddress((ctrAddr.value||CONFIG.CONTRACT_ADDRESS));
+      console.log('[Utils] getCtrAddr', a);
+      return a;
+    }
+
+    const idFromStr = (s) => toBytes32Id((s||'').trim());
+
+    async function readParamByString(assetStr){
+      if(!contract) await connect();
+      const id = idFromStr(assetStr);
+      const p = await contract.assetParams(id);
+      console.log('[Admin] assetParams', { assetStr, id, p });
+      return { id, weightBP: Number(p.weightBP), capUSDc: BigInt(p.capUSDc), set: Boolean(p.set) };
+    }
+
+    function showAdm(msg){
+      admOut.style.display = 'inline-block';
+      admOut.textContent = msg;
+    }
+
+    admCheck.addEventListener('click', async ()=>{
+      try{
+        if(!contract) await connect();
+        const a = (admAssetStr.value||'').trim();
+        if(!a) throw new Error('Asset string required');
+        const p = await readParamByString(a);
+        showAdm(p.set ? `SET • weight=${p.weightBP} bps • cap=$${(Number(p.capUSDc)/100).toLocaleString()}` : 'NOT SET');
+      }catch(e){ console.error('[Admin][Check][ERR]', e); showAdm('Error: '+(e.reason||e.message||String(e))); }
+    });
+
+    admSet.addEventListener('click', async ()=>{
+      try{
+        if(!contract) await connect();
+        const a = (admAssetStr.value||'').trim();
+        const w = Math.max(0, Math.min(10000, parseInt(admWeight.value||'0')));
+        const cap = usdToCentsBigInt(admCapUsd.value||'0');
+        if(!a) throw new Error('Asset string required');
+        if(w>10000) throw new Error('Weight must be <= 10000 bps');
+        if(cap<=0n) throw new Error('Cap must be > 0');
+        const id = idFromStr(a);
+        console.log('[Admin] setAssetParam', { a, id, w, cap:String(cap) });
+        const tx = await contract.setAssetParam(id, w, cap);
+        showAdm('TX: '+tx.hash);
+        const rc = await tx.wait();
+        console.log('[Admin] set done', { status: rc?.status });
+        const p = await readParamByString(a);
+        showAdm(`OK • weight=${p.weightBP} bps • cap=$${(Number(p.capUSDc)/100).toLocaleString()} • tx=${tx.hash}`);
+      }catch(e){ console.error('[Admin][Set][ERR]', e); showAdm('Error: '+(e.reason||e.message||String(e))); }
+    });
+
+    async function preflightCheckAssets(){
+      const missing = [];
+      const details = [];
+      for (const tr of document.querySelectorAll('#rows tr')){
+        const [a] = tr.querySelectorAll('input');
+        const s = (a.value||'').trim();
+        if(!s) continue;
+        const info = await readParamByString(s);
+        if(!info.set){ missing.push(s); }
+        details.push({ s, set: info.set, weightBP: info.weightBP, capUSDc: info.capUSDc });
+      }
+      console.log('[Preflight] assets', details);
+      return { missing, details };
+    }
+
+    async function encryptAmounts64(){
+      const r = await initRelayer();
+      const enc = r.createEncryptedInput(getCtrAddr(), getAddress(address));
+      console.log('[Encrypt] encoder created');
+      const assetIds = []; const usdList = [];
+      document.querySelectorAll('#rows tr').forEach(tr=>{
+        const [a,v] = tr.querySelectorAll('input');
+        const idStr = (a.value||'').trim();
+        const id = idFromStr(idStr);
+        const cents = usdToCentsBigInt(v.value||'0');
+        console.log('[Encrypt] push value', { idStr, id, cents:String(cents) });
+        assetIds.push(id); usdList.push(cents);
+        if (enc.add64) enc.add64(cents); else if (enc.addUint64) enc.addUint64(cents); else throw new Error('SDK: no add64/addUint64');
+      });
+      const { handles, inputProof } = await enc.encrypt();
+      const handlesHex = handles.map(h => typeof h === 'string' ? (h.startsWith('0x')? h : '0x'+h) : toHex(h));
+      const att = toHex(inputProof);
+      console.log('[Encrypt] done', { count: handlesHex.length, attLen: att.length });
+      return { assetIds, handles: handlesHex, att };
+    }
+
+    computeBtn.addEventListener('click', async ()=>{
+      try{
+        if(!contract) await connect();
+        // Preflight: ensure all assets configured
+        computeStatus.textContent = 'Checking assets…';
+        const pf = await preflightCheckAssets();
+        if(pf.missing.length){
+          const msg = `Missing params for: ${pf.missing.join(', ')}`;
+          console.warn('[Compute] preflight failed', pf);
+          computeStatus.textContent = msg;
+          alert(msg + "\nЗадай параметры через секцию Admin.");
+          return;
+        }
+
+        computeStatus.textContent = 'Encrypting…';
+        const { assetIds, handles, att } = await encryptAmounts64();
+        const pidStr = (portfolioStr.value||'portfolio-1').trim();
+        const pid = toBytes32Id(pidStr);
+        console.log('[Compute] inputs', { pidStr, pid, assetIds, handles, attLen: att.length });
+        computeStatus.textContent = 'Sending tx…';
+        const tx = await contract.computePortfolio(pid, assetIds, handles, att);
+        txBox.style.display = 'inline-block';
+        txBox.textContent = 'TX: '+tx.hash;
+        console.log('[Compute] tx sent', tx.hash);
+        const rc = await tx.wait();
+        console.log('[Compute] receipt', { status: rc?.status, gasUsed: rc?.gasUsed?.toString?.() });
+        const next = await contract.nextResultId(pid);
+        const rid = BigInt(next) - 1n;
+        console.log('[Compute] resultId', String(rid));
+        computeStatus.textContent = 'Fetching handles…';
+        const rH = await contract.riskHandle(pid, rid);
+        const hH = await contract.healthHandle(pid, rid);
+        console.log('[Handles] risk/health', rH, hH);
+        riskH.value = String(rH);
+        healthH.value = String(hH);
+        computeStatus.textContent = 'Done';
+      }catch(e){ console.error('[Compute][ERR]', e); computeStatus.textContent = 'Error: '+(e.reason||e.message||String(e)); }
+    });
+
+    async function publicDecryptHandle(h){
+      const r = await initRelayer();
+      console.log('[Decrypt][public] start', h);
+      try{
+        const out = await r.publicDecrypt([h]);
+        console.log('[Decrypt][public] raw', out);
+        const key = Object.keys(out)[0];
+        const val = Number(out[key]);
+        if (Number.isFinite(val)) {
+          if (val <= 10000) {
+            decOut.textContent = `${val} bps (${(val/100).toFixed(2)}%)`;
+          } else {
+            decOut.textContent = String(val);
+          }
+        } else {
+          decOut.textContent = String(out[key]);
+        }
+      }catch(e){
+        const msg = String(e?.message||e);
+        console.warn('[Decrypt][public][ERR]', e);
+        if (msg.includes('not allowed for public decryption')){
+          decOut.textContent = 'Not public. Use userDecrypt or makeResultPublic.';
+          alert('Этот handle не открыт для publicDecrypt.\nНажми "makeResultPublic" (для того же portfolioId/resultId) или используй userDecrypt.');
+        } else {
+          throw e;
+        }
+      }
+    }
+
+    async function userDecryptHandle(h){
+      const r = await initRelayer();
+      console.log('[Decrypt][user] start', h);
+      const kp = await ZAMA_SDK.generateKeypair();
+      const startTs = Math.floor(Date.now()/1000).toString();
+      const days = '7';
+      const eip = r.createEIP712(kp.publicKey, [getCtrAddr()], startTs, days);
+      const signature = await signer.signTypedData(eip.domain, { UserDecryptRequestVerification: eip.types.UserDecryptRequestVerification }, eip.message);
+      const out = await r.userDecrypt([h], kp.privateKey, kp.publicKey, signature.replace(/^0x/, ''), [getCtrAddr()], await signer.getAddress(), startTs, days);
+      console.log('[Decrypt][user] raw', out);
+      const key = Object.keys(out)[0];
+      const val = Number(out[key]);
+      if (Number.isFinite(val)) {
+        if (val <= 10000) decOut.textContent = `${val} bps (${(val/100).toFixed(2)}%)`; else decOut.textContent = String(val);
+      } else {
+        decOut.textContent = String(out[key]);
+      }
+    }
+
+    pubDecRisk.addEventListener('click', async ()=>{ const h = (riskH.value||'').trim(); if(!h) return; try{ await publicDecryptHandle(h); }catch(e){ console.error('[Decrypt][risk][ERR]', e); alert(e.message||e); } });
+    pubDecHealth.addEventListener('click', async ()=>{ const h = (healthH.value||'').trim(); if(!h) return; try{ await publicDecryptHandle(h); }catch(e){ console.error('[Decrypt][health][ERR]', e); alert(e.message||e); } });
+
+    userDecRisk.addEventListener('click', async ()=>{ const h = (riskH.value||'').trim(); if(!h) return; try{ await userDecryptHandle(h); }catch(e){ console.error('[Decrypt][user risk][ERR]', e); alert(e.message||e); } });
+    userDecHealth.addEventListener('click', async ()=>{ const h = (healthH.value||'').trim(); if(!h) return; try{ await userDecryptHandle(h); }catch(e){ console.error('[Decrypt][user health][ERR]', e); alert(e.message||e); } });
+
+    grantBtn.addEventListener('click', async ()=>{
+      try{
+        if(!contract) await connect();
+        const pidStr = (portfolioStr.value||'portfolio-1').trim();
+        const pid = toBytes32Id(pidStr);
+        const next = await contract.nextResultId(pid);
+        const rid = BigInt(next) - 1n;
+        const to = getAddress((grantTo.value||'').trim());
+        console.log('[Access] grant', { pidStr, rid: String(rid), to });
+        const tx = await contract.grantResultAccess(pid, rid, to);
+        const rc = await tx.wait();
+        console.log('[Access] granted', { hash: tx.hash, status: rc?.status });
+        alert('Access granted');
+      }catch(e){ console.error('[Access][grant][ERR]', e); alert(e.message||e); }
+    });
+
+    makePubBtn.addEventListener('click', async ()=>{
+      try{
+        if(!contract) await connect();
+        const pidStr = (portfolioStr.value||'portfolio-1').trim();
+        const pid = toBytes32Id(pidStr);
+        const next = await contract.nextResultId(pid);
+        const rid = BigInt(next) - 1n;
+        console.log('[Access] make public', { pidStr, rid: String(rid) });
+        const tx = await contract.makeResultPublic(pid, rid);
+        const rc = await tx.wait();
+        console.log('[Access] public done', { hash: tx.hash, status: rc?.status });
+        alert('Result made public');
+      }catch(e){ console.error('[Access][public][ERR]', e); alert(e.message||e); }
+    });
+  </script>
+</body>
+</html>
