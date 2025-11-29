@@ -1,4 +1,4 @@
-````markdown
+
 # PortfolioHealth 🧮
 
 **Private portfolio risk & health scoring on top of Zama FHEVM**
@@ -389,9 +389,5 @@ console.log({ riskBP, healthBP });
 
 ---
 
-## 9. License
 
-This contract is released under the **MIT License**.
 
-```
-```
